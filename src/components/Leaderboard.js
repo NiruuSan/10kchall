@@ -17,7 +17,12 @@ function ParticipantRow({ participant, rank, goal }) {
   const progressPercent = Math.min((participant.followers / goal) * 100, 100)
   
   return (
-    <div className="bg-zinc-900/50 rounded-xl p-4 sm:p-5 border border-zinc-800 card-hover">
+    <a 
+      href={`https://tiktok.com/@${participant.username}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block bg-zinc-900/50 rounded-xl p-4 sm:p-5 border border-zinc-800 card-hover cursor-pointer"
+    >
       <div className="flex items-center gap-4">
         {/* Position */}
         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${
@@ -93,7 +98,7 @@ function ParticipantRow({ participant, rank, goal }) {
         <span>{formatNumber(participant.likes)} likes</span>
         <span>{progressPercent.toFixed(1)}%</span>
       </div>
-    </div>
+    </a>
   )
 }
 
