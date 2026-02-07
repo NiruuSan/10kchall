@@ -1,5 +1,8 @@
 'use client'
 
+import RankBadge from './RankBadge'
+import { formatXP } from '@/lib/achievements'
+
 function formatNumber(num) {
   if (num >= 1000000) {
     return (num / 1000000).toFixed(1) + 'M'
@@ -16,7 +19,7 @@ function ParticipantRow({ participant, rank, goal }) {
   return (
     <div className="bg-zinc-900/50 rounded-xl p-4 sm:p-5 border border-zinc-800 card-hover">
       <div className="flex items-center gap-4">
-        {/* Rank */}
+        {/* Position */}
         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${
           rank === 1 ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400'
         }`}>
@@ -38,8 +41,9 @@ function ParticipantRow({ participant, rank, goal }) {
         
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-semibold text-white truncate">{participant.name}</h3>
+            <RankBadge rank={participant.rank} size="sm" />
           </div>
           <p className="text-zinc-500 text-sm">@{participant.username}</p>
           
@@ -47,23 +51,30 @@ function ParticipantRow({ participant, rank, goal }) {
           <div className="mt-2.5 hidden sm:block">
             <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-zinc-500 rounded-full progress-bar"
-                style={{ width: `${progressPercent}%` }}
+                className="h-full rounded-full progress-bar"
+                style={{ 
+                  width: `${progressPercent}%`,
+                  backgroundColor: participant.rankColor || '#71717a'
+                }}
               ></div>
             </div>
           </div>
         </div>
         
         {/* Stats */}
-        <div className="flex items-center gap-6 sm:gap-8">
-          {/* Followers - Main stat */}
+        <div className="flex items-center gap-4 sm:gap-6">
+          {/* XP - Main stat */}
           <div className="text-right">
-            <p className="text-xl sm:text-2xl font-semibold text-white">{formatNumber(participant.followers)}</p>
-            <p className="text-xs text-zinc-600 uppercase tracking-wider">Followers</p>
+            <p className="text-xl sm:text-2xl font-semibold text-white">{formatXP(participant.xp)}</p>
+            <p className="text-xs text-zinc-600 uppercase tracking-wider">XP</p>
           </div>
           
           {/* Secondary stats - hidden on mobile */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-5">
+            <div className="text-right">
+              <p className="text-base font-medium text-zinc-300">{formatNumber(participant.followers)}</p>
+              <p className="text-xs text-zinc-600 uppercase tracking-wider">Followers</p>
+            </div>
             <div className="text-right">
               <p className="text-base font-medium text-zinc-300">{formatNumber(participant.likes)}</p>
               <p className="text-xs text-zinc-600 uppercase tracking-wider">Likes</p>
@@ -78,8 +89,8 @@ function ParticipantRow({ participant, rank, goal }) {
       
       {/* Mobile stats row */}
       <div className="flex items-center justify-between mt-4 pt-3 border-t border-zinc-800 sm:hidden text-sm text-zinc-500">
+        <span>{formatNumber(participant.followers)} followers</span>
         <span>{formatNumber(participant.likes)} likes</span>
-        <span>{participant.videos} videos</span>
         <span>{progressPercent.toFixed(1)}%</span>
       </div>
     </div>

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import RankBadge from '@/components/RankBadge'
+import { formatXP } from '@/lib/achievements'
 
 export default function AdminPage() {
   const [participants, setParticipants] = useState([])
@@ -60,6 +62,7 @@ export default function AdminPage() {
           followers: tiktokData.followers,
           likes: tiktokData.likes,
           videos: tiktokData.videos,
+          max_video_views: tiktokData.max_video_views || 0,
         })
       })
       
@@ -69,6 +72,9 @@ export default function AdminPage() {
         setUsername('')
         setDisplayName('')
         setShowAddForm(false)
+      } else {
+        const data = await res.json()
+        setError(data.error || 'Failed to add participant')
       }
     } catch (err) {
       setError(err.message)
@@ -93,18 +99,14 @@ export default function AdminPage() {
           followers: tiktokData.followers,
           likes: tiktokData.likes,
           videos: tiktokData.videos,
+          max_video_views: tiktokData.max_video_views || participant.max_video_views || 0,
         })
       })
       
       if (res.ok) {
+        const data = await res.json()
         setParticipants(prev => 
-          prev.map(p => p.id === participant.id ? {
-            ...p,
-            avatar: tiktokData.avatar,
-            followers: tiktokData.followers,
-            likes: tiktokData.likes,
-            videos: tiktokData.videos,
-          } : p)
+          prev.map(p => p.id === participant.id ? data.participant : p)
         )
       }
     } catch (err) {
@@ -136,7 +138,7 @@ export default function AdminPage() {
   const formatNumber = (num) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K'
-    return num.toLocaleString()
+    return (num || 0).toLocaleString()
   }
 
   if (loading) {
@@ -262,7 +264,10 @@ export default function AdminPage() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-white truncate">{participant.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium text-white truncate">{participant.name}</h3>
+                    {participant.rank && <RankBadge rank={participant.rank} size="sm" />}
+                  </div>
                   <a 
                     href={`https://tiktok.com/@${participant.username}`}
                     target="_blank"
@@ -272,6 +277,12 @@ export default function AdminPage() {
                     @{participant.username}
                   </a>
                 </div>
+                {participant.xp !== undefined && (
+                  <div className="text-right mr-2">
+                    <p className="text-lg font-semibold text-white">{formatXP(participant.xp)}</p>
+                    <p className="text-zinc-500 text-xs">XP</p>
+                  </div>
+                )}
                 <button
                   onClick={() => refreshParticipant(participant)}
                   disabled={refreshing === participant.id}
@@ -287,7 +298,7 @@ export default function AdminPage() {
                 </button>
               </div>
               
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-3">
                 <div className="bg-zinc-800/50 rounded-lg p-3">
                   <p className="text-zinc-500 text-xs mb-1">Followers</p>
                   <p className="text-lg font-semibold text-white">{formatNumber(participant.followers)}</p>
@@ -300,7 +311,17 @@ export default function AdminPage() {
                   <p className="text-zinc-500 text-xs mb-1">Videos</p>
                   <p className="text-lg font-semibold text-white">{formatNumber(participant.videos)}</p>
                 </div>
+                <div className="bg-zinc-800/50 rounded-lg p-3">
+                  <p className="text-zinc-500 text-xs mb-1">Best Views</p>
+                  <p className="text-lg font-semibold text-white">{formatNumber(participant.max_video_views)}</p>
+                </div>
               </div>
+              
+              {participant.unlockedAchievements?.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-zinc-800">
+                  <p className="text-zinc-500 text-xs mb-2">{participant.unlockedAchievements.length} achievements unlocked</p>
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -1,53 +1,48 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Leaderboard from '@/components/Leaderboard'
 import StatsGrid from '@/components/StatsGrid'
-import { supabase } from '@/lib/supabase'
 
-export const revalidate = 0 // Disable caching, always fetch fresh data
+export default function Home() {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-async function getData() {
-  // Fetch participants
-  const { data: participants, error: participantsError } = await supabase
-    .from('participants')
-    .select('*')
-    .order('followers', { ascending: false })
-  
-  if (participantsError) {
-    console.error('Error fetching participants:', participantsError)
-    return { participants: [], goal: 10000, challengeStartDate: '2026-01-24' }
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      const res = await fetch('/api/participants')
+      const json = await res.json()
+      setData(json)
+    } catch (error) {
+      console.error('Failed to fetch:', error)
+    } finally {
+      setLoading(false)
+    }
   }
-  
-  // Fetch settings
-  const { data: settings } = await supabase
-    .from('settings')
-    .select('*')
-  
-  const settingsObj = (settings || []).reduce((acc, { key, value }) => {
-    acc[key] = key === 'goal' ? parseInt(value) : value
-    return acc
-  }, {})
-  
-  return {
-    participants: participants || [],
-    goal: settingsObj.goal || 10000,
-    challengeStartDate: settingsObj.challengeStartDate || '2026-01-24'
-  }
-}
 
-export default async function Home() {
-  const { participants, goal, challengeStartDate } = await getData()
-  
-  // Sort participants by followers for leaderboard
-  const sortedParticipants = [...participants].sort((a, b) => b.followers - a.followers)
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-700 border-t-zinc-400"></div>
+      </div>
+    )
+  }
+
+  const { participants = [], goal = 10000, challengeStartDate = '2026-01-24' } = data || {}
   
   // Calculate total stats
   const totalFollowers = participants.reduce((sum, p) => sum + p.followers, 0)
   const totalLikes = participants.reduce((sum, p) => sum + p.likes, 0)
   const totalVideos = participants.reduce((sum, p) => sum + p.videos, 0)
   
-  // Find the leader
-  const leader = sortedParticipants[0]
+  // Participants are already sorted by XP from the API
+  const leader = participants[0]
 
   // Empty state
   if (participants.length === 0) {
@@ -86,14 +81,22 @@ export default async function Home() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-white">Leaderboard</h2>
-          <Link 
-            href="/admin"
-            className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
-          >
-            Manage
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link 
+              href="/achievements"
+              className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
+            >
+              Achievements
+            </Link>
+            <Link 
+              href="/admin"
+              className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
+            >
+              Manage
+            </Link>
+          </div>
         </div>
-        <Leaderboard participants={sortedParticipants} goal={goal} />
+        <Leaderboard participants={participants} goal={goal} />
       </section>
       
       {/* Footer */}
