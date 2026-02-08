@@ -1,6 +1,44 @@
 import { supabase } from '@/lib/supabase'
 import { FOLLOWER_MILESTONES } from '@/lib/milestones'
-import { checkAchievements } from '@/lib/achievements'
+import { checkAchievements, ACHIEVEMENTS } from '@/lib/achievements'
+
+// Calculate gains for a participant
+async function calculateGains(participantId, currentFollowers) {
+  const now = new Date()
+  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+  
+  const { data: snapshots } = await supabase
+    .from('stats_snapshots')
+    .select('followers, recorded_at')
+    .eq('participant_id', participantId)
+    .order('recorded_at', { ascending: true })
+  
+  if (!snapshots || snapshots.length === 0) {
+    return { daily: 0, weekly: 0, monthly: 0 }
+  }
+  
+  let dailyBase = currentFollowers
+  let weeklyBase = currentFollowers
+  
+  for (const snap of snapshots) {
+    const snapDate = new Date(snap.recorded_at)
+    if (snapDate <= oneDayAgo) dailyBase = snap.followers
+    if (snapDate <= oneWeekAgo) weeklyBase = snap.followers
+  }
+  
+  const firstSnapshot = snapshots[0]
+  const firstDate = new Date(firstSnapshot.recorded_at)
+  
+  if (firstDate > oneDayAgo) dailyBase = firstSnapshot.followers
+  if (firstDate > oneWeekAgo) weeklyBase = firstSnapshot.followers
+  
+  return {
+    daily: currentFollowers - dailyBase,
+    weekly: currentFollowers - weeklyBase,
+    monthly: 0 // Not needed for achievements
+  }
+}
 
 // Vercel Cron Job - Refresh all participants
 export async function GET(request) {
@@ -23,7 +61,9 @@ export async function GET(request) {
     }
 
     const results = []
+    const updatedParticipants = []
     
+    // First pass: Update all participants with TikTok data
     for (const participant of participants) {
       try {
         // Fetch TikTok data
@@ -32,6 +72,7 @@ export async function GET(request) {
         
         if (!tiktokJson.success) {
           results.push({ id: participant.id, username: participant.username, error: tiktokJson.error })
+          updatedParticipants.push(participant) // Keep original data
           continue
         }
         
@@ -55,6 +96,7 @@ export async function GET(request) {
         
         if (updateError) {
           results.push({ id: participant.id, username: participant.username, error: updateError.message })
+          updatedParticipants.push(participant)
           continue
         }
         
@@ -72,7 +114,6 @@ export async function GET(request) {
         // Check for new follower milestones
         for (const milestone of FOLLOWER_MILESTONES) {
           if (tiktokData.followers >= milestone.count && previousFollowers < milestone.count) {
-            // Check if already recorded
             const { data: existing } = await supabase
               .from('milestones')
               .select('id')
@@ -94,8 +135,54 @@ export async function GET(request) {
           }
         }
         
-        // Check for new achievements
-        const qualifiedIds = checkAchievements({ ...participant, ...updates })
+        // Store updated participant for second pass
+        updatedParticipants.push({ ...participant, ...updates })
+        
+        results.push({ 
+          id: participant.id, 
+          username: participant.username, 
+          success: true,
+          followers: tiktokData.followers,
+          change: tiktokData.followers - previousFollowers
+        })
+        
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+      } catch (err) {
+        results.push({ id: participant.id, username: participant.username, error: err.message })
+        updatedParticipants.push(participant)
+      }
+    }
+    
+    // Sort participants by followers to determine positions
+    updatedParticipants.sort((a, b) => b.followers - a.followers)
+    
+    // Get challenge start date for competition achievements
+    const { data: settings } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'challengeStartDate')
+      .single()
+    
+    const challengeStartDate = settings?.value || '2026-02-07'
+    
+    // Second pass: Check achievements with position and gains data
+    for (let i = 0; i < updatedParticipants.length; i++) {
+      const participant = updatedParticipants[i]
+      const position = i + 1
+      
+      try {
+        // Calculate gains for growth achievements
+        const gains = await calculateGains(participant.id, participant.followers)
+        
+        // Check for achievements with all data including competition requirements
+        const qualifiedIds = checkAchievements(participant, { 
+          gains, 
+          position, 
+          allParticipants: updatedParticipants, 
+          challengeStartDate 
+        })
         
         const { data: existingAchievements } = await supabase
           .from('participant_achievements')
@@ -112,21 +199,27 @@ export async function GET(request) {
           }))
           
           await supabase.from('participant_achievements').insert(inserts)
+          
+          // Record milestones for new achievements
+          for (const achievementId of newAchievementIds) {
+            const achievement = ACHIEVEMENTS.find(a => a.id === achievementId)
+            if (achievement) {
+              try {
+                await supabase.from('milestones').insert({
+                  participant_id: participant.id,
+                  type: 'achievement',
+                  value: achievement.xp_reward,
+                  label: achievement.name,
+                  created_at: new Date().toISOString()
+                })
+              } catch (e) {
+                // Ignore duplicate errors
+              }
+            }
+          }
         }
-        
-        results.push({ 
-          id: participant.id, 
-          username: participant.username, 
-          success: true,
-          followers: tiktokData.followers,
-          change: tiktokData.followers - previousFollowers
-        })
-        
-        // Small delay to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
       } catch (err) {
-        results.push({ id: participant.id, username: participant.username, error: err.message })
+        console.error(`Failed to check achievements for ${participant.username}:`, err)
       }
     }
     

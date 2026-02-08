@@ -99,8 +99,9 @@ async function recordSnapshot(participantId, followers, likes, videos) {
 }
 
 // Auto-unlock achievements for a participant
-async function unlockAchievements(participantId, participant) {
-  const qualifiedIds = checkAchievements(participant)
+// options: { gains, position, allParticipants, challengeStartDate } for various achievement types
+async function unlockAchievements(participantId, participant, options = {}) {
+  const qualifiedIds = checkAchievements(participant, options)
   
   if (qualifiedIds.length === 0) return []
   
@@ -121,6 +122,24 @@ async function unlockAchievements(participantId, participant) {
     }))
     
     await supabase.from('participant_achievements').insert(inserts)
+    
+    // Record milestones for new achievements
+    for (const achievementId of newIds) {
+      const achievement = ACHIEVEMENTS.find(a => a.id === achievementId)
+      if (achievement) {
+        try {
+          await supabase.from('milestones').insert({
+            participant_id: participantId,
+            type: 'achievement',
+            value: achievement.xp_reward,
+            label: achievement.name,
+            created_at: new Date().toISOString()
+          })
+        } catch (e) {
+          // Ignore duplicate errors
+        }
+      }
+    }
   }
   
   return [...existingIds, ...newIds]
@@ -128,6 +147,18 @@ async function unlockAchievements(participantId, participant) {
 
 export async function GET() {
   try {
+    // Fetch settings first (needed for competition achievements)
+    const { data: settings } = await supabase
+      .from('settings')
+      .select('*')
+    
+    const settingsObj = (settings || []).reduce((acc, { key, value }) => {
+      acc[key] = key === 'goal' ? parseInt(value) : value
+      return acc
+    }, {})
+    
+    const challengeStartDate = settingsObj.challengeStartDate || '2026-02-07'
+    
     // Fetch participants
     const { data: participants, error: participantsError } = await supabase
       .from('participants')
@@ -161,6 +192,38 @@ export async function GET() {
     // Sort by XP (descending)
     enrichedParticipants.sort((a, b) => b.xp - a.xp)
     
+    // Check for position-based achievements (after sorting by XP)
+    // Pass all participants and challenge start date for competition achievement validation
+    for (let i = 0; i < enrichedParticipants.length; i++) {
+      const participant = enrichedParticipants[i]
+      const position = i + 1
+      const gains = participant.gains
+      
+      // Check if they qualify for any new position/growth achievements
+      const newUnlocked = await unlockAchievements(
+        participant.id, 
+        participant, 
+        { gains, position, allParticipants: enrichedParticipants, challengeStartDate }
+      )
+      
+      // Update the enriched participant if new achievements were unlocked
+      if (newUnlocked.length > participant.unlockedAchievements.length) {
+        const xp = calculateXP(participant, newUnlocked)
+        const rank = getRank(xp)
+        enrichedParticipants[i] = {
+          ...participant,
+          xp,
+          rank: rank.id,
+          rankName: rank.name,
+          rankColor: rank.color,
+          unlockedAchievements: newUnlocked
+        }
+      }
+    }
+    
+    // Re-sort after potential XP changes from new achievements
+    enrichedParticipants.sort((a, b) => b.xp - a.xp)
+    
     // Get most recent update time from participants
     const lastUpdated = enrichedParticipants.reduce((latest, p) => {
       if (!p.updated_at) return latest
@@ -168,19 +231,9 @@ export async function GET() {
       return pDate > latest ? pDate : latest
     }, new Date(0))
     
-    // Fetch settings
-    const { data: settings } = await supabase
-      .from('settings')
-      .select('*')
-    
-    const settingsObj = (settings || []).reduce((acc, { key, value }) => {
-      acc[key] = key === 'goal' ? parseInt(value) : value
-      return acc
-    }, {})
-    
     return Response.json({
       goal: settingsObj.goal || 10000,
-      challengeStartDate: settingsObj.challengeStartDate || '2026-02-07',
+      challengeStartDate,
       lastUpdated: lastUpdated.getTime() > 0 ? lastUpdated.toISOString() : null,
       participants: enrichedParticipants
     })
@@ -215,11 +268,41 @@ export async function PUT(request) {
     // Record snapshot for history tracking
     await recordSnapshot(participantId, data.followers, data.likes, data.videos)
     
-    // Auto-unlock achievements
-    const unlockedIds = await unlockAchievements(participantId, data)
-    
     // Calculate gains
     const gains = await calculateGains(participantId, data.followers)
+    
+    // Get all participants for position and competition achievements
+    const { data: allParticipants } = await supabase
+      .from('participants')
+      .select('*')
+      .order('followers', { ascending: false })
+    
+    let position = 1
+    if (allParticipants) {
+      for (let i = 0; i < allParticipants.length; i++) {
+        if (allParticipants[i].id === participantId) {
+          position = i + 1
+          break
+        }
+      }
+    }
+    
+    // Get challenge start date for competition achievements
+    const { data: settings } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'challengeStartDate')
+      .single()
+    
+    const challengeStartDate = settings?.value || '2026-02-07'
+    
+    // Auto-unlock achievements with gains, position, and competition data
+    const unlockedIds = await unlockAchievements(participantId, data, { 
+      gains, 
+      position, 
+      allParticipants: allParticipants || [], 
+      challengeStartDate 
+    })
     
     return Response.json({ 
       success: true, 
@@ -266,12 +349,43 @@ export async function POST(request) {
     // Record initial snapshot
     await recordSnapshot(data.id, data.followers, data.likes, data.videos)
     
+    // Get all participants for position and competition achievements
+    const { data: allParticipants } = await supabase
+      .from('participants')
+      .select('*')
+      .order('followers', { ascending: false })
+    
+    let position = 1
+    if (allParticipants) {
+      for (let i = 0; i < allParticipants.length; i++) {
+        if (allParticipants[i].id === data.id) {
+          position = i + 1
+          break
+        }
+      }
+    }
+    
+    // Get challenge start date for competition achievements
+    const { data: settings } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'challengeStartDate')
+      .single()
+    
+    const challengeStartDate = settings?.value || '2026-02-07'
+    
     // Auto-unlock achievements
-    const unlockedIds = await unlockAchievements(data.id, data)
+    const gains = { daily: 0, weekly: 0, monthly: 0 }
+    const unlockedIds = await unlockAchievements(data.id, data, { 
+      gains, 
+      position, 
+      allParticipants: allParticipants || [], 
+      challengeStartDate 
+    })
     
     return Response.json({ 
       success: true, 
-      participant: enrichParticipant(data, unlockedIds, { daily: 0, weekly: 0, monthly: 0 })
+      participant: enrichParticipant(data, unlockedIds, gains)
     })
   } catch (error) {
     console.error('POST error:', error)
@@ -293,6 +407,12 @@ export async function DELETE(request) {
     // Delete snapshots
     await supabase
       .from('stats_snapshots')
+      .delete()
+      .eq('participant_id', participantId)
+    
+    // Delete milestones
+    await supabase
+      .from('milestones')
       .delete()
       .eq('participant_id', participantId)
     
