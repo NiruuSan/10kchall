@@ -11,7 +11,7 @@ export default function Header({ goal, leader }) {
     <header className="border-b border-zinc-200 dark:border-zinc-800/50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Logo / Title */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-3">
             <span className="text-zinc-900 dark:text-white">10K</span>
             <span className="text-zinc-400 dark:text-zinc-500"> Challenge</span>
@@ -20,7 +20,7 @@ export default function Header({ goal, leader }) {
         </div>
         
         {/* Leader highlight */}
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md mx-auto animate-scale-in" style={{ animationDelay: '0.2s', opacity: 0 }}>
           <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Current Leader</span>

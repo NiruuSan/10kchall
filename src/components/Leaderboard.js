@@ -20,7 +20,7 @@ function ParticipantRow({ participant, rank, goal, onClick }) {
   return (
     <div 
       onClick={onClick}
-      className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-4 sm:p-5 border border-zinc-200 dark:border-zinc-800 card-hover cursor-pointer"
+      className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-4 sm:p-5 border border-zinc-200 dark:border-zinc-800 card-hover cursor-pointer stagger-item"
     >
       <div className="flex items-center gap-4">
         {/* Position */}

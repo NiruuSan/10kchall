@@ -56,7 +56,7 @@ function ActivityItem({ activity }) {
   }
 
   return (
-    <div className="flex items-start gap-3 py-3">
+    <div className="flex items-start gap-3 py-3 stagger-item">
       {getIcon()}
       <div className="flex-1 min-w-0">
         <p className="text-sm text-zinc-700 dark:text-zinc-300">

@@ -167,7 +167,7 @@ export default function AdminPage() {
     <main className="min-h-screen p-6 sm:p-8">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 animate-fade-in-down">
           <div>
             <Link href="/" className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm mb-2 inline-block transition-colors">
               &larr; Back
@@ -196,7 +196,7 @@ export default function AdminPage() {
 
         {/* Add participant form */}
         {showAddForm && (
-          <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-5 border border-zinc-200 dark:border-zinc-800 mb-6">
+          <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-5 border border-zinc-200 dark:border-zinc-800 mb-6 animate-fade-in-up">
             <h2 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-4">Add TikTok Account</h2>
             <form onSubmit={addParticipant} className="space-y-4">
               <div className="flex flex-wrap gap-3">
@@ -260,11 +260,11 @@ export default function AdminPage() {
         )}
 
         {/* Participants list */}
-        <div className="space-y-3">
+        <div className="space-y-3 animate-fade-in-up animate-delay-1">
           {participants.map(participant => (
             <div 
               key={participant.id}
-              className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-5 border border-zinc-200 dark:border-zinc-800"
+              className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-5 border border-zinc-200 dark:border-zinc-800 stagger-item"
             >
               <div className="flex items-center gap-3 mb-4">
                 {participant.avatar ? (

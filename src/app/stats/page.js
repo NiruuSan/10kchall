@@ -89,7 +89,7 @@ export default function StatsPage() {
   return (
     <main className="min-h-screen pb-20">
       {/* Header */}
-      <header className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+      <header className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8 animate-fade-in-down">
         <div className="flex items-center justify-between mb-6">
           <Link 
             href="/"
@@ -108,7 +108,7 @@ export default function StatsPage() {
       </header>
 
       {/* Controls */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 animate-fade-in-up animate-delay-1">
         <div className="flex flex-wrap items-center gap-4">
           {/* Time range */}
           <div className="flex items-center gap-2">
@@ -153,7 +153,7 @@ export default function StatsPage() {
       </section>
 
       {/* Chart */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in-up animate-delay-2">
         <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-4 sm:p-6 border border-zinc-200 dark:border-zinc-800">
           {data.length > 0 ? (
             <ResponsiveContainer width="100%" height={400}>
@@ -210,13 +210,13 @@ export default function StatsPage() {
       </section>
 
       {/* Stats Summary */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 animate-fade-in-up animate-delay-3">
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">Growth Summary</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {participants.map((p, i) => (
             <div 
               key={p.id}
-              className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800"
+              className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 stagger-item"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div 

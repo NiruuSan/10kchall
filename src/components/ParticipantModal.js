@@ -69,7 +69,7 @@ export default function ParticipantModal({ participant, goal, onClose }) {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
       onClick={onClose}
     >
       {/* Backdrop */}
@@ -77,7 +77,7 @@ export default function ParticipantModal({ participant, goal, onClose }) {
       
       {/* Modal */}
       <div 
-        className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 w-full max-w-md overflow-hidden"
+        className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 w-full max-w-md overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}

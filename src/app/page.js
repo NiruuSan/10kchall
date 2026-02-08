@@ -126,10 +126,12 @@ export default function Home() {
         onDismiss={dismissNotification} 
       />
       
-      <Header goal={goal} leader={leader} />
+      <div className="animate-fade-in-down">
+        <Header goal={goal} leader={leader} />
+      </div>
       
       {/* Stats Overview */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 animate-fade-in-up animate-delay-1">
         <StatsGrid 
           totalFollowers={totalFollowers}
           totalLikes={totalLikes}
@@ -139,7 +141,7 @@ export default function Home() {
       </section>
       
       {/* Leaderboard & Activity Feed */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 animate-fade-in-up animate-delay-2">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Leaderboard</h2>
           <div className="flex items-center gap-4">
@@ -167,19 +169,19 @@ export default function Home() {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Leaderboard - takes 2 columns on large screens */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 animate-fade-in-up animate-delay-3">
             <Leaderboard participants={participants} goal={goal} />
           </div>
           
           {/* Activity Feed - takes 1 column on large screens */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 animate-fade-in-up animate-delay-4">
             <ActivityFeed />
           </div>
         </div>
       </section>
       
       {/* Footer */}
-      <footer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 text-center text-zinc-500 dark:text-zinc-600 text-sm space-y-1">
+      <footer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 text-center text-zinc-500 dark:text-zinc-600 text-sm space-y-1 animate-fade-in animate-delay-5">
         {lastUpdated && (
           <p className="flex items-center justify-center gap-1.5">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>

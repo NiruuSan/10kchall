@@ -131,7 +131,7 @@ export default function ShareCard({ participant, goal, onClose }) {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in"
       onClick={onClose}
     >
       {/* Backdrop */}
@@ -139,7 +139,7 @@ export default function ShareCard({ participant, goal, onClose }) {
       
       {/* Modal */}
       <div 
-        className="relative flex flex-col items-center gap-4 max-w-lg w-full my-8"
+        className="relative flex flex-col items-center gap-4 max-w-lg w-full my-8 animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}

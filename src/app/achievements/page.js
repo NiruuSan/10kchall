@@ -82,7 +82,7 @@ export default function AchievementsPage() {
     <main className="min-h-screen p-6 sm:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 animate-fade-in-down">
           <div>
             <Link href="/" className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm mb-2 inline-block transition-colors">
               &larr; Back to Leaderboard
@@ -95,7 +95,7 @@ export default function AchievementsPage() {
 
         {/* Participant selector */}
         {participants.length > 0 && (
-          <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 mb-6">
+          <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 mb-6 animate-fade-in-up animate-delay-1">
             <div className="flex items-center gap-4 flex-wrap">
               <span className="text-zinc-500 dark:text-zinc-400 text-sm">View achievements for:</span>
               <div className="flex gap-2 flex-wrap">
@@ -142,12 +142,16 @@ export default function AchievementsPage() {
         )}
 
         {/* Achievement categories */}
-        {categories.map(category => {
+        {categories.map((category, categoryIndex) => {
           const categoryAchievements = achievements.filter(a => a.category === category.id)
           if (categoryAchievements.length === 0) return null
           
           return (
-            <div key={category.id} className="mb-8">
+            <div 
+              key={category.id} 
+              className="mb-8 animate-fade-in-up"
+              style={{ animationDelay: `${0.2 + categoryIndex * 0.1}s`, opacity: 0 }}
+            >
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
                 <span>{category.icon}</span>
                 {category.name}
@@ -156,7 +160,7 @@ export default function AchievementsPage() {
                 {categoryAchievements.map(achievement => (
                   <div
                     key={achievement.id}
-                    className={`rounded-xl p-4 border transition-all ${
+                    className={`rounded-xl p-4 border transition-all hover:scale-[1.02] ${
                       achievement.unlocked
                         ? 'bg-zinc-100 dark:bg-zinc-900/80 border-zinc-300 dark:border-zinc-700'
                         : 'bg-zinc-50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800/50 opacity-60'
