@@ -88,6 +88,7 @@ export default function AdminPage() {
     
     try {
       const tiktokData = await fetchTikTokData(participant.username)
+      const previousFollowers = participant.followers
       
       // Update all stats at once
       const res = await fetch('/api/participants', {
@@ -108,6 +109,18 @@ export default function AdminPage() {
         setParticipants(prev => 
           prev.map(p => p.id === participant.id ? data.participant : p)
         )
+        
+        // Check for new milestones
+        await fetch('/api/milestones', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            participantId: participant.id,
+            participantName: participant.name,
+            followers: tiktokData.followers,
+            previousFollowers: previousFollowers,
+          })
+        })
       }
     } catch (err) {
       alert(`Failed to refresh: ${err.message}`)

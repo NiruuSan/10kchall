@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import RankBadge from './RankBadge'
+import ShareCard from './ShareCard'
 import { formatXP, getNextRank, RANKS } from '@/lib/achievements'
 
 function formatNumber(num) {
@@ -15,6 +16,8 @@ function formatNumber(num) {
 }
 
 export default function ParticipantModal({ participant, goal, onClose }) {
+  const [showShareCard, setShowShareCard] = useState(false)
+  
   const xp = participant.xp || 0
   const progressPercent = Math.min((participant.followers / goal) * 100, 100)
   const nextRankData = getNextRank(xp)
@@ -33,11 +36,17 @@ export default function ParticipantModal({ participant, goal, onClose }) {
   // Close on escape key
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        if (showShareCard) {
+          setShowShareCard(false)
+        } else {
+          onClose()
+        }
+      }
     }
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
-  }, [onClose])
+  }, [onClose, showShareCard])
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -46,6 +55,17 @@ export default function ParticipantModal({ participant, goal, onClose }) {
       document.body.style.overflow = 'unset'
     }
   }, [])
+
+  // Show share card
+  if (showShareCard) {
+    return (
+      <ShareCard 
+        participant={participant} 
+        goal={goal} 
+        onClose={() => setShowShareCard(false)} 
+      />
+    )
+  }
 
   return (
     <div 
@@ -176,15 +196,26 @@ export default function ParticipantModal({ participant, goal, onClose }) {
             </div>
           )}
 
-          {/* TikTok button */}
-          <a
-            href={`https://tiktok.com/@${participant.username}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full py-3 bg-white text-zinc-900 text-center font-medium rounded-xl hover:bg-zinc-200 transition-colors"
-          >
-            View on TikTok
-          </a>
+          {/* Action buttons */}
+          <div className="flex gap-3">
+            <a
+              href={`https://tiktok.com/@${participant.username}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 py-3 bg-white text-zinc-900 text-center font-medium rounded-xl hover:bg-zinc-200 transition-colors"
+            >
+              View on TikTok
+            </a>
+            <button
+              onClick={() => setShowShareCard(true)}
+              className="px-4 py-3 bg-zinc-800 text-white font-medium rounded-xl hover:bg-zinc-700 transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              Share
+            </button>
+          </div>
         </div>
       </div>
     </div>

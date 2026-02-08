@@ -5,13 +5,16 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Leaderboard from '@/components/Leaderboard'
 import StatsGrid from '@/components/StatsGrid'
+import MilestoneToast from '@/components/MilestoneToast'
 
 export default function Home() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [notifications, setNotifications] = useState([])
 
   useEffect(() => {
     fetchData()
+    fetchRecentMilestones()
   }, [])
 
   const fetchData = async () => {
@@ -24,6 +27,40 @@ export default function Home() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchRecentMilestones = async () => {
+    try {
+      const res = await fetch('/api/milestones')
+      const json = await res.json()
+      
+      // Convert milestones to notifications (show only ones from last hour)
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+      const recentMilestones = (json.milestones || [])
+        .filter(m => new Date(m.created_at) > oneHourAgo)
+        .slice(0, 3) // Only show up to 3
+      
+      const newNotifications = recentMilestones.map(m => ({
+        id: m.id,
+        type: m.type,
+        title: m.type === 'follower' 
+          ? `${m.participants?.name || 'Someone'} hit ${m.label}!`
+          : m.type === 'achievement'
+          ? `${m.participants?.name || 'Someone'} unlocked an achievement!`
+          : `${m.participants?.name || 'Someone'} ranked up!`,
+        message: m.type === 'follower'
+          ? `@${m.participants?.username || 'unknown'} reached a new milestone`
+          : m.label
+      }))
+      
+      setNotifications(newNotifications)
+    } catch (error) {
+      console.error('Failed to fetch milestones:', error)
+    }
+  }
+
+  const dismissNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id))
   }
 
   if (loading) {
@@ -65,6 +102,12 @@ export default function Home() {
 
   return (
     <main className="min-h-screen pb-20">
+      {/* Milestone Notifications */}
+      <MilestoneToast 
+        notifications={notifications} 
+        onDismiss={dismissNotification} 
+      />
+      
       <Header goal={goal} leader={leader} />
       
       {/* Stats Overview */}
