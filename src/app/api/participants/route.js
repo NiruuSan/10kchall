@@ -161,6 +161,13 @@ export async function GET() {
     // Sort by XP (descending)
     enrichedParticipants.sort((a, b) => b.xp - a.xp)
     
+    // Get most recent update time from participants
+    const lastUpdated = enrichedParticipants.reduce((latest, p) => {
+      if (!p.updated_at) return latest
+      const pDate = new Date(p.updated_at)
+      return pDate > latest ? pDate : latest
+    }, new Date(0))
+    
     // Fetch settings
     const { data: settings } = await supabase
       .from('settings')
@@ -174,6 +181,7 @@ export async function GET() {
     return Response.json({
       goal: settingsObj.goal || 10000,
       challengeStartDate: settingsObj.challengeStartDate || '2026-02-07',
+      lastUpdated: lastUpdated.getTime() > 0 ? lastUpdated.toISOString() : null,
       participants: enrichedParticipants
     })
   } catch (error) {

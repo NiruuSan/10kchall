@@ -1,11 +1,15 @@
 import { supabase } from '@/lib/supabase'
 import { FOLLOWER_MILESTONES } from '@/lib/milestones'
 
-// Get recent milestones (last 24 hours)
-export async function GET() {
+// Get recent milestones
+export async function GET(request) {
   try {
-    const oneDayAgo = new Date()
-    oneDayAgo.setDate(oneDayAgo.getDate() - 1)
+    const { searchParams } = new URL(request.url)
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const hours = parseInt(searchParams.get('hours') || '168') // Default 7 days
+    
+    const cutoffDate = new Date()
+    cutoffDate.setHours(cutoffDate.getHours() - hours)
     
     const { data, error } = await supabase
       .from('milestones')
@@ -13,9 +17,9 @@ export async function GET() {
         *,
         participants (name, username, avatar)
       `)
-      .gte('created_at', oneDayAgo.toISOString())
+      .gte('created_at', cutoffDate.toISOString())
       .order('created_at', { ascending: false })
-      .limit(10)
+      .limit(limit)
     
     if (error) throw error
     

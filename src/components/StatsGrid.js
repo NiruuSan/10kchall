@@ -12,9 +12,9 @@ function formatNumber(num) {
 
 function StatCard({ label, value }) {
   return (
-    <div className="bg-zinc-900/50 rounded-xl p-5 border border-zinc-800">
+    <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-5 border border-zinc-200 dark:border-zinc-800">
       <p className="text-zinc-500 text-sm mb-1">{label}</p>
-      <p className="text-2xl font-semibold text-white">{formatNumber(value)}</p>
+      <p className="text-2xl font-semibold text-zinc-900 dark:text-white">{formatNumber(value)}</p>
     </div>
   )
 }

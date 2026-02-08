@@ -9,27 +9,43 @@
 }
 
 body {
-  background: #09090b;
-  color: #fafafa;
   font-family: 'Inter', system-ui, sans-serif;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
+/* Custom scrollbar - Dark mode */
+.dark ::-webkit-scrollbar {
   width: 6px;
 }
 
-::-webkit-scrollbar-track {
+.dark ::-webkit-scrollbar-track {
   background: #18181b;
 }
 
-::-webkit-scrollbar-thumb {
+.dark ::-webkit-scrollbar-thumb {
   background: #27272a;
   border-radius: 3px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+.dark ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
+}
+
+/* Custom scrollbar - Light mode */
+.light ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.light ::-webkit-scrollbar-track {
+  background: #f4f4f5;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 3px;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
 }
 
 /* Card hover effect */
@@ -37,8 +53,14 @@ body {
   transition: all 0.2s ease;
 }
 
-.card-hover:hover {
-  background: rgba(255, 255, 255, 0.08);
+.dark .card-hover:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.light .card-hover:hover,
+html:not(.dark) .card-hover:hover {
+  background: #fafafa !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 /* Progress bar animation */

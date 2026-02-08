@@ -6,6 +6,8 @@ import Header from '@/components/Header'
 import Leaderboard from '@/components/Leaderboard'
 import StatsGrid from '@/components/StatsGrid'
 import MilestoneToast from '@/components/MilestoneToast'
+import ActivityFeed from '@/components/ActivityFeed'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export default function Home() {
   const [data, setData] = useState(null)
@@ -71,7 +73,23 @@ export default function Home() {
     )
   }
 
-  const { participants = [], goal = 10000, challengeStartDate = '2026-02-07' } = data || {}
+  const { participants = [], goal = 10000, challengeStartDate = '2026-02-07', lastUpdated } = data || {}
+  
+  // Format relative time
+  const getRelativeTime = (dateString) => {
+    if (!dateString) return null
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now - date
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+    
+    if (diffMins < 1) return 'just now'
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  }
   
   // Calculate total stats
   const totalFollowers = participants.reduce((sum, p) => sum + p.followers, 0)
@@ -86,13 +104,13 @@ export default function Home() {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-4">
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-3 text-center">
-          <span className="text-white">10K</span>
-          <span className="text-zinc-500"> Challenge</span>
+          <span className="text-zinc-900 dark:text-white">10K</span>
+          <span className="text-zinc-400 dark:text-zinc-500"> Challenge</span>
         </h1>
         <p className="text-zinc-500 mb-8 text-center">Race to 10,000 TikTok followers</p>
         <Link 
           href="/admin"
-          className="px-5 py-2.5 bg-white text-zinc-900 text-sm font-medium rounded-lg hover:bg-zinc-200 transition-colors"
+          className="px-5 py-2.5 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-sm font-medium rounded-lg hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-colors"
         >
           Add Participants
         </Link>
@@ -120,36 +138,54 @@ export default function Home() {
         />
       </section>
       
-      {/* Leaderboard */}
+      {/* Leaderboard & Activity Feed */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-white">Leaderboard</h2>
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Leaderboard</h2>
           <div className="flex items-center gap-4">
             <Link 
               href="/stats"
-              className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
+              className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm transition-colors"
             >
               Stats
             </Link>
             <Link 
               href="/achievements"
-              className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
+              className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm transition-colors"
             >
               Achievements
             </Link>
             <Link 
               href="/admin"
-              className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
+              className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm transition-colors"
             >
               Manage
             </Link>
+            <ThemeToggle />
           </div>
         </div>
-        <Leaderboard participants={participants} goal={goal} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Leaderboard - takes 2 columns on large screens */}
+          <div className="lg:col-span-2">
+            <Leaderboard participants={participants} goal={goal} />
+          </div>
+          
+          {/* Activity Feed - takes 1 column on large screens */}
+          <div className="lg:col-span-1">
+            <ActivityFeed />
+          </div>
+        </div>
       </section>
       
       {/* Footer */}
-      <footer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 text-center text-zinc-600 text-sm">
+      <footer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 text-center text-zinc-500 dark:text-zinc-600 text-sm space-y-1">
+        {lastUpdated && (
+          <p className="flex items-center justify-center gap-1.5">
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+            Stats updated {getRelativeTime(lastUpdated)}
+          </p>
+        )}
         <p>Started {new Date(challengeStartDate).toLocaleDateString('en-US', { 
           month: 'long', 
           day: 'numeric', 

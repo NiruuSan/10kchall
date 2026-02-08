@@ -1,4 +1,5 @@
 import './globals.css'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 export const metadata = {
   title: '10K Challenge',
@@ -10,9 +11,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen antialiased">
-        {children}
+    <html lang="en" className="dark">
+      <body className="min-h-screen antialiased bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white transition-colors">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )
