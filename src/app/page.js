@@ -34,7 +34,7 @@ export default function Home() {
     )
   }
 
-  const { participants = [], goal = 10000, challengeStartDate = '2026-01-24' } = data || {}
+  const { participants = [], goal = 10000, challengeStartDate = '2026-02-07' } = data || {}
   
   // Calculate total stats
   const totalFollowers = participants.reduce((sum, p) => sum + p.followers, 0)
@@ -82,6 +82,12 @@ export default function Home() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-white">Leaderboard</h2>
           <div className="flex items-center gap-4">
+            <Link 
+              href="/stats"
+              className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
+            >
+              Stats
+            </Link>
             <Link 
               href="/achievements"
               className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"

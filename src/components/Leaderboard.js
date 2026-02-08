@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import RankBadge from './RankBadge'
-import { formatXP } from '@/lib/achievements'
+import ParticipantModal from './ParticipantModal'
 
 function formatNumber(num) {
   if (num >= 1000000) {
@@ -13,15 +14,13 @@ function formatNumber(num) {
   return num.toLocaleString()
 }
 
-function ParticipantRow({ participant, rank, goal }) {
+function ParticipantRow({ participant, rank, goal, onClick }) {
   const progressPercent = Math.min((participant.followers / goal) * 100, 100)
   
   return (
-    <a 
-      href={`https://tiktok.com/@${participant.username}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block bg-zinc-900/50 rounded-xl p-4 sm:p-5 border border-zinc-800 card-hover cursor-pointer"
+    <div 
+      onClick={onClick}
+      className="bg-zinc-900/50 rounded-xl p-4 sm:p-5 border border-zinc-800 card-hover cursor-pointer"
     >
       <div className="flex items-center gap-4">
         {/* Position */}
@@ -56,11 +55,8 @@ function ParticipantRow({ participant, rank, goal }) {
           <div className="mt-2.5 hidden sm:block">
             <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
               <div 
-                className="h-full rounded-full progress-bar"
-                style={{ 
-                  width: `${progressPercent}%`,
-                  backgroundColor: participant.rankColor || '#71717a'
-                }}
+                className="h-full rounded-full bg-white/80"
+                style={{ width: `${progressPercent}%` }}
               ></div>
             </div>
           </div>
@@ -68,18 +64,13 @@ function ParticipantRow({ participant, rank, goal }) {
         
         {/* Stats */}
         <div className="flex items-center gap-4 sm:gap-6">
-          {/* XP - Main stat */}
           <div className="text-right">
-            <p className="text-xl sm:text-2xl font-semibold text-white">{formatXP(participant.xp)}</p>
-            <p className="text-xs text-zinc-600 uppercase tracking-wider">XP</p>
+            <p className="text-xl sm:text-2xl font-semibold text-white">{formatNumber(participant.followers)}</p>
+            <p className="text-xs text-zinc-600 uppercase tracking-wider">Followers</p>
           </div>
           
           {/* Secondary stats - hidden on mobile */}
           <div className="hidden md:flex items-center gap-5">
-            <div className="text-right">
-              <p className="text-base font-medium text-zinc-300">{formatNumber(participant.followers)}</p>
-              <p className="text-xs text-zinc-600 uppercase tracking-wider">Followers</p>
-            </div>
             <div className="text-right">
               <p className="text-base font-medium text-zinc-300">{formatNumber(participant.likes)}</p>
               <p className="text-xs text-zinc-600 uppercase tracking-wider">Likes</p>
@@ -94,25 +85,38 @@ function ParticipantRow({ participant, rank, goal }) {
       
       {/* Mobile stats row */}
       <div className="flex items-center justify-between mt-4 pt-3 border-t border-zinc-800 sm:hidden text-sm text-zinc-500">
-        <span>{formatNumber(participant.followers)} followers</span>
         <span>{formatNumber(participant.likes)} likes</span>
+        <span>{participant.videos} videos</span>
         <span>{progressPercent.toFixed(1)}%</span>
       </div>
-    </a>
+    </div>
   )
 }
 
 export default function Leaderboard({ participants, goal }) {
+  const [selectedParticipant, setSelectedParticipant] = useState(null)
+
   return (
-    <div className="space-y-3">
-      {participants.map((participant, index) => (
-        <ParticipantRow 
-          key={participant.id} 
-          participant={participant} 
-          rank={index + 1}
+    <>
+      <div className="space-y-3">
+        {participants.map((participant, index) => (
+          <ParticipantRow 
+            key={participant.id} 
+            participant={participant} 
+            rank={index + 1}
+            goal={goal}
+            onClick={() => setSelectedParticipant(participant)}
+          />
+        ))}
+      </div>
+
+      {selectedParticipant && (
+        <ParticipantModal
+          participant={selectedParticipant}
           goal={goal}
+          onClose={() => setSelectedParticipant(null)}
         />
-      ))}
-    </div>
+      )}
+    </>
   )
 }
