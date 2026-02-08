@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import ThemeToggle from '@/components/ThemeToggle'
 
 const COLORS = [
   '#f43f5e', // rose
@@ -78,7 +79,7 @@ export default function StatsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-700 border-t-zinc-400"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-300 dark:border-zinc-700 border-t-zinc-600 dark:border-t-zinc-400"></div>
       </div>
     )
   }
@@ -92,15 +93,16 @@ export default function StatsPage() {
         <div className="flex items-center justify-between mb-6">
           <Link 
             href="/"
-            className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
+            className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm transition-colors"
           >
             &larr; Back
           </Link>
+          <ThemeToggle />
         </div>
         
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-          <span className="text-white">Growth</span>
-          <span className="text-zinc-500"> History</span>
+          <span className="text-zinc-900 dark:text-white">Growth</span>
+          <span className="text-zinc-400 dark:text-zinc-500"> History</span>
         </h1>
         <p className="text-zinc-500 mt-2">Track follower growth over time</p>
       </header>
@@ -118,8 +120,8 @@ export default function StatsPage() {
                   onClick={() => setDays(d)}
                   className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
                     days === d 
-                      ? 'bg-zinc-700 text-white' 
-                      : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
+                      ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white' 
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
                   {d}d
@@ -138,8 +140,8 @@ export default function StatsPage() {
                   onClick={() => setChartType(type)}
                   className={`px-3 py-1.5 text-sm rounded-md transition-colors capitalize ${
                     chartType === type 
-                      ? 'bg-zinc-700 text-white' 
-                      : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
+                      ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white' 
+                      : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                 >
                   {type}
@@ -152,19 +154,19 @@ export default function StatsPage() {
 
       {/* Chart */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-zinc-900/50 rounded-xl p-4 sm:p-6 border border-zinc-800">
+        <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-4 sm:p-6 border border-zinc-200 dark:border-zinc-800">
           {data.length > 0 ? (
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-zinc-200 dark:stroke-zinc-800" />
                 <XAxis 
                   dataKey="date" 
-                  tick={{ fill: '#71717a', fontSize: 12 }}
-                  axisLine={{ stroke: '#3f3f46' }}
+                  tick={{ className: 'fill-zinc-500', fontSize: 12 }}
+                  axisLine={{ className: 'stroke-zinc-300 dark:stroke-zinc-700' }}
                 />
                 <YAxis 
-                  tick={{ fill: '#71717a', fontSize: 12 }}
-                  axisLine={{ stroke: '#3f3f46' }}
+                  tick={{ className: 'fill-zinc-500', fontSize: 12 }}
+                  axisLine={{ className: 'stroke-zinc-300 dark:stroke-zinc-700' }}
                   tickFormatter={(value) => {
                     if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M'
                     if (value >= 1000) return (value / 1000).toFixed(1) + 'K'
@@ -173,10 +175,10 @@ export default function StatsPage() {
                 />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#18181b', 
-                    border: '1px solid #3f3f46',
+                    backgroundColor: 'var(--tooltip-bg, #18181b)', 
+                    border: '1px solid var(--tooltip-border, #3f3f46)',
                     borderRadius: '8px',
-                    color: '#fff'
+                    color: 'var(--tooltip-color, #fff)'
                   }}
                   labelStyle={{ color: '#a1a1aa' }}
                 />
@@ -209,44 +211,44 @@ export default function StatsPage() {
 
       {/* Stats Summary */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        <h2 className="text-lg font-semibold text-white mb-4">Growth Summary</h2>
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">Growth Summary</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {participants.map((p, i) => (
             <div 
               key={p.id}
-              className="bg-zinc-900/50 rounded-xl p-4 border border-zinc-800"
+              className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div 
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: COLORS[i % COLORS.length] }}
                 />
-                <span className="font-medium text-white">{p.name}</span>
+                <span className="font-medium text-zinc-900 dark:text-white">{p.name}</span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <div>
                   <p className={`font-medium ${
-                    p.gains?.daily > 0 ? 'text-emerald-400' : 'text-zinc-400'
+                    p.gains?.daily > 0 ? 'text-emerald-500' : 'text-zinc-500 dark:text-zinc-400'
                   }`}>
                     {p.gains?.daily >= 0 ? '+' : ''}{p.gains?.daily || 0}
                   </p>
-                  <p className="text-zinc-600 text-xs">24h</p>
+                  <p className="text-zinc-500 dark:text-zinc-600 text-xs">24h</p>
                 </div>
                 <div>
                   <p className={`font-medium ${
-                    p.gains?.weekly > 0 ? 'text-emerald-400' : 'text-zinc-400'
+                    p.gains?.weekly > 0 ? 'text-emerald-500' : 'text-zinc-500 dark:text-zinc-400'
                   }`}>
                     {p.gains?.weekly >= 0 ? '+' : ''}{p.gains?.weekly || 0}
                   </p>
-                  <p className="text-zinc-600 text-xs">7d</p>
+                  <p className="text-zinc-500 dark:text-zinc-600 text-xs">7d</p>
                 </div>
                 <div>
                   <p className={`font-medium ${
-                    p.gains?.monthly > 0 ? 'text-emerald-400' : 'text-zinc-400'
+                    p.gains?.monthly > 0 ? 'text-emerald-500' : 'text-zinc-500 dark:text-zinc-400'
                   }`}>
                     {p.gains?.monthly >= 0 ? '+' : ''}{p.gains?.monthly || 0}
                   </p>
-                  <p className="text-zinc-600 text-xs">30d</p>
+                  <p className="text-zinc-500 dark:text-zinc-600 text-xs">30d</p>
                 </div>
               </div>
             </div>

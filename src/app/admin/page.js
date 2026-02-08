@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import RankBadge from '@/components/RankBadge'
 import { formatXP } from '@/lib/achievements'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export default function AdminPage() {
   const [participants, setParticipants] = useState([])
@@ -157,7 +158,7 @@ export default function AdminPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-700 border-t-zinc-400"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-300 dark:border-zinc-700 border-t-zinc-600 dark:border-t-zinc-400"></div>
       </div>
     )
   }
@@ -168,24 +169,25 @@ export default function AdminPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-sm mb-2 inline-block transition-colors">
+            <Link href="/" className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm mb-2 inline-block transition-colors">
               &larr; Back
             </Link>
-            <h1 className="text-2xl font-semibold text-white">Manage Participants</h1>
+            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">Manage Participants</h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             {participants.length > 0 && (
               <button
                 onClick={refreshAll}
                 disabled={refreshing !== null}
-                className="px-4 py-2 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-lg hover:bg-zinc-700 transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm font-medium rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors disabled:opacity-50"
               >
                 Refresh All
               </button>
             )}
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="px-4 py-2 bg-white text-zinc-900 text-sm font-medium rounded-lg hover:bg-zinc-200 transition-colors"
+              className="px-4 py-2 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-sm font-medium rounded-lg hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-colors"
             >
               Add Participant
             </button>
@@ -194,8 +196,8 @@ export default function AdminPage() {
 
         {/* Add participant form */}
         {showAddForm && (
-          <div className="bg-zinc-900/50 rounded-xl p-5 border border-zinc-800 mb-6">
-            <h2 className="text-sm font-medium text-zinc-400 mb-4">Add TikTok Account</h2>
+          <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-5 border border-zinc-200 dark:border-zinc-800 mb-6">
+            <h2 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-4">Add TikTok Account</h2>
             <form onSubmit={addParticipant} className="space-y-4">
               <div className="flex flex-wrap gap-3">
                 <input
@@ -203,7 +205,7 @@ export default function AdminPage() {
                   placeholder="TikTok username (e.g. @username)"
                   value={username}
                   onChange={e => setUsername(e.target.value)}
-                  className="flex-1 min-w-[200px] px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-zinc-600"
+                  className="flex-1 min-w-[200px] px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600"
                   required
                 />
                 <input
@@ -211,19 +213,19 @@ export default function AdminPage() {
                   placeholder="Display name (optional)"
                   value={displayName}
                   onChange={e => setDisplayName(e.target.value)}
-                  className="flex-1 min-w-[160px] px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-zinc-600"
+                  className="flex-1 min-w-[160px] px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600"
                 />
               </div>
               
               {error && (
-                <p className="text-red-400 text-sm">{error}</p>
+                <p className="text-red-500 text-sm">{error}</p>
               )}
               
               <div className="flex gap-3">
                 <button
                   type="submit"
                   disabled={fetching || !username}
-                  className="px-4 py-2 bg-white text-zinc-900 text-sm font-medium rounded-lg hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-sm font-medium rounded-lg hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {fetching ? 'Fetching...' : 'Add from TikTok'}
                 </button>
@@ -235,7 +237,7 @@ export default function AdminPage() {
                     setUsername('')
                     setDisplayName('')
                   }}
-                  className="px-4 py-2 text-zinc-400 text-sm hover:text-zinc-300 transition-colors"
+                  className="px-4 py-2 text-zinc-500 dark:text-zinc-400 text-sm hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                 >
                   Cancel
                 </button>
@@ -250,7 +252,7 @@ export default function AdminPage() {
             <p className="text-zinc-500 mb-4">No participants yet</p>
             <button
               onClick={() => setShowAddForm(true)}
-              className="px-4 py-2 bg-white text-zinc-900 text-sm font-medium rounded-lg hover:bg-zinc-200 transition-colors"
+              className="px-4 py-2 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-sm font-medium rounded-lg hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-colors"
             >
               Add your first participant
             </button>
@@ -262,7 +264,7 @@ export default function AdminPage() {
           {participants.map(participant => (
             <div 
               key={participant.id}
-              className="bg-zinc-900/50 rounded-xl p-5 border border-zinc-800"
+              className="bg-zinc-100 dark:bg-zinc-900/50 rounded-xl p-5 border border-zinc-200 dark:border-zinc-800"
             >
               <div className="flex items-center gap-3 mb-4">
                 {participant.avatar ? (
@@ -272,67 +274,67 @@ export default function AdminPage() {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-medium text-zinc-400">
+                  <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-sm font-medium text-zinc-600 dark:text-zinc-400">
                     {participant.name.charAt(0)}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-white truncate">{participant.name}</h3>
+                    <h3 className="font-medium text-zinc-900 dark:text-white truncate">{participant.name}</h3>
                     {participant.rank && <RankBadge rank={participant.rank} size="sm" />}
                   </div>
                   <a 
                     href={`https://tiktok.com/@${participant.username}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-zinc-500 text-sm hover:text-zinc-400 transition-colors"
+                    className="text-zinc-500 text-sm hover:text-zinc-700 dark:hover:text-zinc-400 transition-colors"
                   >
                     @{participant.username}
                   </a>
                 </div>
                 {participant.xp !== undefined && (
                   <div className="text-right mr-2">
-                    <p className="text-lg font-semibold text-white">{formatXP(participant.xp)}</p>
+                    <p className="text-lg font-semibold text-zinc-900 dark:text-white">{formatXP(participant.xp)}</p>
                     <p className="text-zinc-500 text-xs">XP</p>
                   </div>
                 )}
                 <button
                   onClick={() => refreshParticipant(participant)}
                   disabled={refreshing === participant.id}
-                  className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors disabled:opacity-50"
+                  className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm transition-colors disabled:opacity-50"
                 >
                   {refreshing === participant.id ? 'Refreshing...' : 'Refresh'}
                 </button>
                 <button
                   onClick={() => deleteParticipant(participant.id)}
-                  className="text-zinc-600 hover:text-zinc-400 text-sm transition-colors"
+                  className="text-zinc-400 dark:text-zinc-600 hover:text-red-500 text-sm transition-colors"
                 >
                   Remove
                 </button>
               </div>
               
               <div className="grid grid-cols-4 gap-3">
-                <div className="bg-zinc-800/50 rounded-lg p-3">
+                <div className="bg-white dark:bg-zinc-800/50 rounded-lg p-3">
                   <p className="text-zinc-500 text-xs mb-1">Followers</p>
-                  <p className="text-lg font-semibold text-white">{formatNumber(participant.followers)}</p>
+                  <p className="text-lg font-semibold text-zinc-900 dark:text-white">{formatNumber(participant.followers)}</p>
                 </div>
-                <div className="bg-zinc-800/50 rounded-lg p-3">
+                <div className="bg-white dark:bg-zinc-800/50 rounded-lg p-3">
                   <p className="text-zinc-500 text-xs mb-1">Likes</p>
-                  <p className="text-lg font-semibold text-white">{formatNumber(participant.likes)}</p>
+                  <p className="text-lg font-semibold text-zinc-900 dark:text-white">{formatNumber(participant.likes)}</p>
                 </div>
-                <div className="bg-zinc-800/50 rounded-lg p-3">
+                <div className="bg-white dark:bg-zinc-800/50 rounded-lg p-3">
                   <p className="text-zinc-500 text-xs mb-1">Videos</p>
-                  <p className="text-lg font-semibold text-white">{formatNumber(participant.videos)}</p>
+                  <p className="text-lg font-semibold text-zinc-900 dark:text-white">{formatNumber(participant.videos)}</p>
                 </div>
-                <div className="bg-zinc-800/50 rounded-lg p-3">
+                <div className="bg-white dark:bg-zinc-800/50 rounded-lg p-3">
                   <p className="text-zinc-500 text-xs mb-1">Best Views</p>
-                  <p className="text-lg font-semibold text-white">{formatNumber(participant.max_video_views)}</p>
+                  <p className="text-lg font-semibold text-zinc-900 dark:text-white">{formatNumber(participant.max_video_views)}</p>
                 </div>
               </div>
               
               {participant.unlockedAchievements?.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-zinc-800">
-                  <p className="text-zinc-500 text-xs mb-2">{participant.unlockedAchievements.length} achievements unlocked</p>
+                <div className="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                  <p className="text-zinc-500 text-xs">{participant.unlockedAchievements.length} achievements unlocked</p>
                 </div>
               )}
             </div>

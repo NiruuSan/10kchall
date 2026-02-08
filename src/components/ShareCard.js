@@ -135,7 +135,7 @@ export default function ShareCard({ participant, goal, onClose }) {
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/50 dark:bg-black/90 backdrop-blur-sm" />
       
       {/* Modal */}
       <div 
@@ -145,7 +145,7 @@ export default function ShareCard({ participant, goal, onClose }) {
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute -top-2 -right-2 text-zinc-500 hover:text-white transition-colors z-10 bg-zinc-800 rounded-full p-2"
+          className="absolute -top-2 -right-2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-white transition-colors z-10 bg-white dark:bg-zinc-800 rounded-full p-2 shadow-lg"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -153,7 +153,7 @@ export default function ShareCard({ participant, goal, onClose }) {
         </button>
 
         {/* Background selector */}
-        <div className="w-full" style={{ maxWidth: '400px' }}>
+        <div className="w-full bg-white dark:bg-transparent rounded-xl p-4 dark:p-0" style={{ maxWidth: '400px' }}>
           <p className="text-xs text-zinc-500 mb-2">Background</p>
           <div className="flex flex-wrap gap-2 mb-2">
             {BACKGROUNDS.map((bg) => (
@@ -161,7 +161,7 @@ export default function ShareCard({ participant, goal, onClose }) {
                 key={bg.id}
                 onClick={() => handleSelectBg(bg)}
                 className={`w-8 h-8 rounded-lg border-2 transition-all ${
-                  selectedBg?.id === bg.id ? 'border-white scale-110' : 'border-transparent hover:border-zinc-600'
+                  selectedBg?.id === bg.id ? 'border-zinc-900 dark:border-white scale-110' : 'border-transparent hover:border-zinc-400 dark:hover:border-zinc-600'
                 }`}
                 style={bg.type === 'gradient' ? { background: bg.value } : { backgroundColor: bg.value }}
                 title={bg.name}
@@ -170,12 +170,12 @@ export default function ShareCard({ participant, goal, onClose }) {
             {/* Upload button */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className={`w-8 h-8 rounded-lg border-2 transition-all flex items-center justify-center bg-zinc-800 ${
-                customImage ? 'border-white scale-110' : 'border-transparent hover:border-zinc-600'
+              className={`w-8 h-8 rounded-lg border-2 transition-all flex items-center justify-center bg-zinc-200 dark:bg-zinc-800 ${
+                customImage ? 'border-zinc-900 dark:border-white scale-110' : 'border-transparent hover:border-zinc-400 dark:hover:border-zinc-600'
               }`}
               title="Upload image"
             >
-              <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-zinc-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </button>
@@ -193,7 +193,7 @@ export default function ShareCard({ participant, goal, onClose }) {
                 setCustomImage(null)
                 setSelectedBg(BACKGROUNDS[0])
               }}
-              className="text-xs text-zinc-500 hover:text-zinc-300"
+              className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
             >
               Remove custom image
             </button>
@@ -319,10 +319,10 @@ export default function ShareCard({ participant, goal, onClose }) {
           <button
             onClick={handleDownload}
             disabled={downloading}
-            className="flex-1 py-3 bg-white text-zinc-900 font-medium rounded-xl hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-medium rounded-xl hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {downloading ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-zinc-400 border-t-zinc-900"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-zinc-400 dark:border-zinc-400 border-t-white dark:border-t-zinc-900"></div>
             ) : (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -333,7 +333,7 @@ export default function ShareCard({ participant, goal, onClose }) {
           <button
             onClick={handleCopyImage}
             disabled={downloading}
-            className="flex-1 py-3 bg-zinc-800 text-white font-medium rounded-xl hover:bg-zinc-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-medium rounded-xl hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -342,7 +342,7 @@ export default function ShareCard({ participant, goal, onClose }) {
           </button>
         </div>
 
-        <p className="text-xs text-zinc-600 text-center">
+        <p className="text-xs text-zinc-500 dark:text-zinc-600 text-center">
           Share your progress on social media!
         </p>
       </div>
