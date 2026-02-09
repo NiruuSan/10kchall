@@ -8,7 +8,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import { useAuth } from '@/components/AuthProvider'
 
 export default function AdminPage() {
-  const { user, loading: authLoading, signIn, signUp, signOut } = useAuth()
+  const { user, loading: authLoading, signIn, signOut } = useAuth()
   
   const [participants, setParticipants] = useState([])
   const [loading, setLoading] = useState(true)
@@ -20,7 +20,6 @@ export default function AdminPage() {
   const [error, setError] = useState('')
   
   // Auth form state
-  const [authMode, setAuthMode] = useState('login') // 'login' or 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [authError, setAuthError] = useState('')
@@ -40,14 +39,7 @@ export default function AdminPage() {
     setAuthSubmitting(true)
 
     try {
-      if (authMode === 'signup') {
-        // Sign up and automatically sign in
-        await signUp(email, password)
-        // Try to sign in immediately (works if email confirmation is disabled)
-        await signIn(email, password)
-      } else {
-        await signIn(email, password)
-      }
+      await signIn(email, password)
     } catch (err) {
       setAuthError(err.message)
     } finally {
@@ -219,12 +211,8 @@ export default function AdminPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <h1 className="text-xl font-semibold text-zinc-900 dark:text-white">
-                {authMode === 'login' ? 'Admin Login' : 'Create Admin Account'}
-              </h1>
-              <p className="text-zinc-500 text-sm mt-1">
-                {authMode === 'login' ? 'Sign in to manage participants' : 'Set up your admin account'}
-              </p>
+              <h1 className="text-xl font-semibold text-zinc-900 dark:text-white">Admin Login</h1>
+              <p className="text-zinc-500 text-sm mt-1">Sign in to manage participants</p>
             </div>
             
             <form onSubmit={handleAuth} className="space-y-4">
@@ -251,9 +239,7 @@ export default function AdminPage() {
               </div>
               
               {authError && (
-                <p className={`text-sm text-center ${authError.includes('Check your email') ? 'text-emerald-500' : 'text-red-500'}`}>
-                  {authError}
-                </p>
+                <p className="text-sm text-center text-red-500">{authError}</p>
               )}
               
               <button
@@ -261,25 +247,13 @@ export default function AdminPage() {
                 disabled={authSubmitting}
                 className="w-full py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-medium rounded-xl hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50"
               >
-                {authSubmitting ? 'Please wait...' : (authMode === 'login' ? 'Sign In' : 'Create Account')}
+                {authSubmitting ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
             
-            <div className="mt-4 text-center">
-              <button
-                onClick={() => {
-                  setAuthMode(authMode === 'login' ? 'signup' : 'login')
-                  setAuthError('')
-                }}
-                className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm transition-colors"
-              >
-                {authMode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-              </button>
-            </div>
-            
             <Link 
               href="/"
-              className="block text-center text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm mt-4 transition-colors"
+              className="block text-center text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm mt-6 transition-colors"
             >
               &larr; Back to Leaderboard
             </Link>
