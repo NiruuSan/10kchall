@@ -85,7 +85,6 @@ export async function GET(request) {
           likes: tiktokData.likes,
           videos: tiktokData.videos,
           avatar: tiktokData.avatar,
-          max_video_views: Math.max(tiktokData.max_video_views || 0, participant.max_video_views || 0),
           updated_at: new Date().toISOString()
         }
         

@@ -30,14 +30,6 @@ export const ACHIEVEMENTS = [
   { id: 'videos_50', name: 'Prolific Creator', description: 'Post 50 videos', xp_reward: 5000, icon: '🎥', category: 'videos', threshold: 50 },
   { id: 'videos_100', name: 'Century', description: 'Post 100 videos', xp_reward: 10000, icon: '💯', category: 'videos', threshold: 100 },
   
-  // Views milestones (best video)
-  { id: 'views_1k', name: 'First Spark', description: 'Get a video with 1K+ views', xp_reward: 500, icon: '✨', category: 'views', threshold: 1000 },
-  { id: 'views_10k', name: 'Getting Noticed', description: 'Get a video with 10K+ views', xp_reward: 1000, icon: '👀', category: 'views', threshold: 10000 },
-  { id: 'views_100k', name: 'Viral Moment', description: 'Get a video with 100K+ views', xp_reward: 3000, icon: '🔥', category: 'views', threshold: 100000 },
-  { id: 'views_500k', name: 'Going Viral', description: 'Get a video with 500K+ views', xp_reward: 5000, icon: '⚡', category: 'views', threshold: 500000 },
-  { id: 'views_1m', name: 'Million Club', description: 'Get a video with 1M+ views', xp_reward: 10000, icon: '🚀', category: 'views', threshold: 1000000 },
-  { id: 'views_10m', name: 'Internet Famous', description: 'Get a video with 10M+ views', xp_reward: 25000, icon: '👑', category: 'views', threshold: 10000000 },
-  
   // Ratio-based achievements (likes per video)
   { id: 'ratio_100', name: 'Engaged Audience', description: 'Average 100+ likes per video', xp_reward: 2000, icon: '📊', category: 'ratio', threshold: 100 },
   { id: 'ratio_500', name: 'High Performer', description: 'Average 500+ likes per video', xp_reward: 3500, icon: '🎖️', category: 'ratio', threshold: 500 },
@@ -138,10 +130,6 @@ export function checkAchievements(participant, options = {}) {
         break
       case 'videos':
         value = participant.videos || 0
-        qualifies = value >= achievement.threshold
-        break
-      case 'views':
-        value = participant.max_video_views || 0
         qualifies = value >= achievement.threshold
         break
       case 'ratio':

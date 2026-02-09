@@ -98,7 +98,6 @@ export default function AdminPage() {
           followers: tiktokData.followers,
           likes: tiktokData.likes,
           videos: tiktokData.videos,
-          max_video_views: tiktokData.max_video_views || 0,
         })
       })
       
@@ -136,7 +135,6 @@ export default function AdminPage() {
           followers: tiktokData.followers,
           likes: tiktokData.likes,
           videos: tiktokData.videos,
-          max_video_views: tiktokData.max_video_views || participant.max_video_views || 0,
         })
       })
       
@@ -443,10 +441,6 @@ export default function AdminPage() {
                 <div className="bg-white dark:bg-zinc-800/50 rounded-lg p-3">
                   <p className="text-zinc-500 text-xs mb-1">Videos</p>
                   <p className="text-lg font-semibold text-zinc-900 dark:text-white">{formatNumber(participant.videos)}</p>
-                </div>
-                <div className="bg-white dark:bg-zinc-800/50 rounded-lg p-3">
-                  <p className="text-zinc-500 text-xs mb-1">Best Views</p>
-                  <p className="text-lg font-semibold text-zinc-900 dark:text-white">{formatNumber(participant.max_video_views)}</p>
                 </div>
               </div>
               

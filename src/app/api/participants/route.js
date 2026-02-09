@@ -252,14 +252,13 @@ export async function GET() {
 export async function PUT(request) {
   try {
     const body = await request.json()
-    const { participantId, followers, likes, videos, avatar, max_video_views } = body
+    const { participantId, followers, likes, videos, avatar } = body
     
     const updates = {}
     if (followers !== undefined) updates.followers = followers
     if (likes !== undefined) updates.likes = likes
     if (videos !== undefined) updates.videos = videos
     if (avatar !== undefined) updates.avatar = avatar
-    if (max_video_views !== undefined) updates.max_video_views = max_video_views
     updates.updated_at = new Date().toISOString()
     
     const { data, error } = await supabase
@@ -323,7 +322,7 @@ export async function PUT(request) {
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { name, username, followers = 0, likes = 0, videos = 0, avatar = null, max_video_views = 0 } = body
+    const { name, username, followers = 0, likes = 0, videos = 0, avatar = null } = body
     
     // Check if username already exists
     const { data: existing } = await supabase
@@ -344,8 +343,7 @@ export async function POST(request) {
         avatar,
         followers,
         likes,
-        videos,
-        max_video_views
+        videos
       })
       .select()
       .single()

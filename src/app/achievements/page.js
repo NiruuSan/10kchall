@@ -60,7 +60,6 @@ export default function AchievementsPage() {
     { id: 'followers', name: 'Followers', icon: '👥' },
     { id: 'likes', name: 'Likes', icon: '❤️' },
     { id: 'videos', name: 'Videos', icon: '🎬' },
-    { id: 'views', name: 'Views', icon: '👁️' },
     { id: 'ratio', name: 'Engagement', icon: '📊' },
     { id: 'growth_daily', name: 'Daily Growth', icon: '⚡' },
     { id: 'growth_weekly', name: 'Weekly Growth', icon: '🗓️' },
