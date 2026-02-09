@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import html2canvas from 'html2canvas'
 import { formatXP, RANKS } from '@/lib/achievements'
 
@@ -35,10 +36,16 @@ export default function ShareCard({ participant, goal, onClose }) {
   const [downloading, setDownloading] = useState(false)
   const [selectedBg, setSelectedBg] = useState(BACKGROUNDS[0])
   const [customImage, setCustomImage] = useState(null)
+  const [mounted, setMounted] = useState(false)
   
   const xp = participant.xp || 0
   const progressPercent = Math.min((participant.followers / goal) * 100, 100)
   const currentRank = RANKS.find(r => r.id === participant.rank) || RANKS[0]
+
+  // Mount check for portal
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0]
@@ -129,24 +136,29 @@ export default function ShareCard({ participant, goal, onClose }) {
     }
   }
 
-  return (
+  // Don't render until mounted (for SSR)
+  if (!mounted) return null
+
+  const modalContent = (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in"
+      className="fixed inset-0 z-[9999] overflow-y-auto animate-fade-in"
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 dark:bg-black/90 backdrop-blur-sm" />
+      <div className="fixed inset-0 bg-black/50 dark:bg-black/90 backdrop-blur-sm" />
       
-      {/* Modal */}
-      <div 
-        className="relative flex flex-col items-center gap-4 max-w-lg w-full my-8 animate-scale-in"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute -top-2 -right-2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-white transition-colors z-10 bg-white dark:bg-zinc-800 rounded-full p-2 shadow-lg"
+      {/* Centering wrapper */}
+      <div className="min-h-full flex items-center justify-center p-4">
+        {/* Modal */}
+        <div 
+          className="relative flex flex-col items-center gap-4 max-w-lg w-full animate-scale-in"
+          onClick={(e) => e.stopPropagation()}
         >
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute -top-2 -right-2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-white transition-colors z-10 bg-white dark:bg-zinc-800 rounded-full p-2 shadow-lg"
+          >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -345,7 +357,10 @@ export default function ShareCard({ participant, goal, onClose }) {
         <p className="text-xs text-zinc-500 dark:text-zinc-600 text-center">
           Share your progress on social media!
         </p>
+        </div>
       </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }

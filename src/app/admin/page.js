@@ -5,8 +5,11 @@ import Link from 'next/link'
 import RankBadge from '@/components/RankBadge'
 import { formatXP } from '@/lib/achievements'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useAuth } from '@/components/AuthProvider'
 
 export default function AdminPage() {
+  const { user, loading: authLoading, signIn, signUp, signOut } = useAuth()
+  
   const [participants, setParticipants] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -15,10 +18,50 @@ export default function AdminPage() {
   const [fetching, setFetching] = useState(false)
   const [refreshing, setRefreshing] = useState(null)
   const [error, setError] = useState('')
+  
+  // Auth form state
+  const [authMode, setAuthMode] = useState('login') // 'login' or 'signup'
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [authError, setAuthError] = useState('')
+  const [authSubmitting, setAuthSubmitting] = useState(false)
 
   useEffect(() => {
-    fetchParticipants()
-  }, [])
+    if (user) {
+      fetchParticipants()
+    } else if (!authLoading) {
+      setLoading(false)
+    }
+  }, [user, authLoading])
+
+  const handleAuth = async (e) => {
+    e.preventDefault()
+    setAuthError('')
+    setAuthSubmitting(true)
+
+    try {
+      if (authMode === 'signup') {
+        // Sign up and automatically sign in
+        await signUp(email, password)
+        // Try to sign in immediately (works if email confirmation is disabled)
+        await signIn(email, password)
+      } else {
+        await signIn(email, password)
+      }
+    } catch (err) {
+      setAuthError(err.message)
+    } finally {
+      setAuthSubmitting(false)
+    }
+  }
+
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+    } catch (err) {
+      console.error('Failed to sign out:', err)
+    }
+  }
 
   const fetchParticipants = async () => {
     try {
@@ -155,6 +198,97 @@ export default function AdminPage() {
     return (num || 0).toLocaleString()
   }
 
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-300 dark:border-zinc-700 border-t-zinc-600 dark:border-t-zinc-400"></div>
+      </div>
+    )
+  }
+
+  // Auth gate
+  if (!user) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-sm animate-scale-in">
+          <div className="bg-zinc-100 dark:bg-zinc-900/50 rounded-2xl p-8 border border-zinc-200 dark:border-zinc-800">
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 bg-zinc-200 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h1 className="text-xl font-semibold text-zinc-900 dark:text-white">
+                {authMode === 'login' ? 'Admin Login' : 'Create Admin Account'}
+              </h1>
+              <p className="text-zinc-500 text-sm mt-1">
+                {authMode === 'login' ? 'Sign in to manage participants' : 'Set up your admin account'}
+              </p>
+            </div>
+            
+            <form onSubmit={handleAuth} className="space-y-4">
+              <div>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600"
+                  required
+                />
+              </div>
+              <div>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600"
+                  required
+                  minLength={6}
+                />
+              </div>
+              
+              {authError && (
+                <p className={`text-sm text-center ${authError.includes('Check your email') ? 'text-emerald-500' : 'text-red-500'}`}>
+                  {authError}
+                </p>
+              )}
+              
+              <button
+                type="submit"
+                disabled={authSubmitting}
+                className="w-full py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-medium rounded-xl hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-colors disabled:opacity-50"
+              >
+                {authSubmitting ? 'Please wait...' : (authMode === 'login' ? 'Sign In' : 'Create Account')}
+              </button>
+            </form>
+            
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => {
+                  setAuthMode(authMode === 'login' ? 'signup' : 'login')
+                  setAuthError('')
+                }}
+                className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm transition-colors"
+              >
+                {authMode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              </button>
+            </div>
+            
+            <Link 
+              href="/"
+              className="block text-center text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm mt-4 transition-colors"
+            >
+              &larr; Back to Leaderboard
+            </Link>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -173,9 +307,19 @@ export default function AdminPage() {
               &larr; Back
             </Link>
             <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">Manage Participants</h1>
+            <p className="text-zinc-500 text-sm">{user.email}</p>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <button
+              onClick={handleSignOut}
+              className="p-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+              title="Sign Out"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
             {participants.length > 0 && (
               <button
                 onClick={refreshAll}

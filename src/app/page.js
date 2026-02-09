@@ -36,10 +36,14 @@ export default function Home() {
       const res = await fetch('/api/milestones')
       const json = await res.json()
       
+      // Get already shown notifications from session storage
+      const shownIds = JSON.parse(sessionStorage.getItem('shownNotifications') || '[]')
+      
       // Convert milestones to notifications (show only ones from last hour)
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
       const recentMilestones = (json.milestones || [])
         .filter(m => new Date(m.created_at) > oneHourAgo)
+        .filter(m => !shownIds.includes(m.id)) // Filter out already shown
         .slice(0, 3) // Only show up to 3
       
       const newNotifications = recentMilestones.map(m => ({
@@ -54,6 +58,12 @@ export default function Home() {
           ? `@${m.participants?.username || 'unknown'} reached a new milestone`
           : m.label
       }))
+      
+      // Mark these as shown in session storage
+      if (newNotifications.length > 0) {
+        const newShownIds = [...shownIds, ...newNotifications.map(n => n.id)]
+        sessionStorage.setItem('shownNotifications', JSON.stringify(newShownIds))
+      }
       
       setNotifications(newNotifications)
     } catch (error) {
@@ -96,7 +106,7 @@ export default function Home() {
   const totalLikes = participants.reduce((sum, p) => sum + p.likes, 0)
   const totalVideos = participants.reduce((sum, p) => sum + p.videos, 0)
   
-  // Participants are already sorted by XP from the API
+  // Participants are already sorted by followers from the API
   const leader = participants[0]
 
   // Empty state

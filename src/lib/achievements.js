@@ -3,15 +3,20 @@ export const ACHIEVEMENTS = [
   // Follower milestones
   { id: 'followers_50', name: 'Baby Steps', description: 'Reach 50 followers', xp_reward: 250, icon: '👶', category: 'followers', threshold: 50 },
   { id: 'followers_100', name: 'First Steps', description: 'Reach 100 followers', xp_reward: 500, icon: '👣', category: 'followers', threshold: 100 },
+  { id: 'followers_250', name: 'Quarter K', description: 'Reach 250 followers', xp_reward: 750, icon: '🔢', category: 'followers', threshold: 250 },
   { id: 'followers_500', name: 'Getting Traction', description: 'Reach 500 followers', xp_reward: 1000, icon: '📈', category: 'followers', threshold: 500 },
+  { id: 'followers_750', name: 'Three Quarters', description: 'Reach 750 followers', xp_reward: 1500, icon: '📊', category: 'followers', threshold: 750 },
   { id: 'followers_1k', name: 'Thousand Club', description: 'Reach 1,000 followers', xp_reward: 2000, icon: '🎯', category: 'followers', threshold: 1000 },
   { id: 'followers_2500', name: 'Making Waves', description: 'Reach 2,500 followers', xp_reward: 3000, icon: '🌊', category: 'followers', threshold: 2500 },
   { id: 'followers_5k', name: 'Halfway There', description: 'Reach 5,000 followers', xp_reward: 5000, icon: '⭐', category: 'followers', threshold: 5000 },
+  { id: 'followers_7500', name: 'So Close', description: 'Reach 7,500 followers', xp_reward: 7500, icon: '🎪', category: 'followers', threshold: 7500 },
   { id: 'followers_10k', name: 'The Goal', description: 'Reach 10,000 followers', xp_reward: 10000, icon: '🏆', category: 'followers', threshold: 10000 },
   
   // Likes milestones
   { id: 'likes_1k', name: 'First Love', description: 'Reach 1,000 total likes', xp_reward: 500, icon: '💗', category: 'likes', threshold: 1000 },
+  { id: 'likes_5k', name: 'Liked', description: 'Reach 5,000 total likes', xp_reward: 1000, icon: '👍', category: 'likes', threshold: 5000 },
   { id: 'likes_10k', name: 'Heart Collector', description: 'Reach 10,000 total likes', xp_reward: 2000, icon: '❤️', category: 'likes', threshold: 10000 },
+  { id: 'likes_25k', name: 'Super Liked', description: 'Reach 25,000 total likes', xp_reward: 2500, icon: '💝', category: 'likes', threshold: 25000 },
   { id: 'likes_50k', name: 'Fan Favorite', description: 'Reach 50,000 total likes', xp_reward: 3000, icon: '🥰', category: 'likes', threshold: 50000 },
   { id: 'likes_100k', name: 'Love Magnet', description: 'Reach 100,000 total likes', xp_reward: 5000, icon: '💕', category: 'likes', threshold: 100000 },
   { id: 'likes_500k', name: 'Heartbreaker', description: 'Reach 500,000 total likes', xp_reward: 7500, icon: '💘', category: 'likes', threshold: 500000 },
@@ -19,12 +24,14 @@ export const ACHIEVEMENTS = [
   
   // Video milestones
   { id: 'videos_1', name: 'First Upload', description: 'Post your first video', xp_reward: 250, icon: '🎉', category: 'videos', threshold: 1 },
+  { id: 'videos_5', name: 'Warming Up', description: 'Post 5 videos', xp_reward: 500, icon: '🎞️', category: 'videos', threshold: 5 },
   { id: 'videos_10', name: 'Content Machine', description: 'Post 10 videos', xp_reward: 1000, icon: '🎬', category: 'videos', threshold: 10 },
   { id: 'videos_25', name: 'Consistent Creator', description: 'Post 25 videos', xp_reward: 2500, icon: '📹', category: 'videos', threshold: 25 },
   { id: 'videos_50', name: 'Prolific Creator', description: 'Post 50 videos', xp_reward: 5000, icon: '🎥', category: 'videos', threshold: 50 },
   { id: 'videos_100', name: 'Century', description: 'Post 100 videos', xp_reward: 10000, icon: '💯', category: 'videos', threshold: 100 },
   
   // Views milestones (best video)
+  { id: 'views_1k', name: 'First Spark', description: 'Get a video with 1K+ views', xp_reward: 500, icon: '✨', category: 'views', threshold: 1000 },
   { id: 'views_10k', name: 'Getting Noticed', description: 'Get a video with 10K+ views', xp_reward: 1000, icon: '👀', category: 'views', threshold: 10000 },
   { id: 'views_100k', name: 'Viral Moment', description: 'Get a video with 100K+ views', xp_reward: 3000, icon: '🔥', category: 'views', threshold: 100000 },
   { id: 'views_500k', name: 'Going Viral', description: 'Get a video with 500K+ views', xp_reward: 5000, icon: '⚡', category: 'views', threshold: 500000 },
@@ -33,10 +40,14 @@ export const ACHIEVEMENTS = [
   
   // Ratio-based achievements (likes per video)
   { id: 'ratio_100', name: 'Engaged Audience', description: 'Average 100+ likes per video', xp_reward: 2000, icon: '📊', category: 'ratio', threshold: 100 },
+  { id: 'ratio_500', name: 'High Performer', description: 'Average 500+ likes per video', xp_reward: 3500, icon: '🎖️', category: 'ratio', threshold: 500 },
   { id: 'ratio_1000', name: 'Quality Creator', description: 'Average 1,000+ likes per video', xp_reward: 5000, icon: '💎', category: 'ratio', threshold: 1000 },
   
   // Growth achievements (daily gains)
+  { id: 'growth_daily_50', name: 'Hot Day', description: 'Gain 50+ followers in a single day', xp_reward: 1000, icon: '☀️', category: 'growth_daily', threshold: 50 },
   { id: 'growth_daily_100', name: 'Speed Demon', description: 'Gain 100+ followers in a single day', xp_reward: 1500, icon: '⚡', category: 'growth_daily', threshold: 100 },
+  { id: 'growth_daily_250', name: 'Explosive Growth', description: 'Gain 250+ followers in a single day', xp_reward: 3000, icon: '💣', category: 'growth_daily', threshold: 250 },
+  { id: 'growth_weekly_250', name: 'Steady Climb', description: 'Gain 250+ followers in 7 days', xp_reward: 2000, icon: '🧗', category: 'growth_weekly', threshold: 250 },
   { id: 'growth_weekly_500', name: 'Week Warrior', description: 'Gain 500+ followers in 7 days', xp_reward: 3000, icon: '🗓️', category: 'growth_weekly', threshold: 500 },
   
   // Competition achievements

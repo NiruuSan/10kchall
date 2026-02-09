@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import RankBadge from './RankBadge'
 import ShareCard from './ShareCard'
 import { formatXP, getNextRank, RANKS } from '@/lib/achievements'
@@ -17,6 +18,7 @@ function formatNumber(num) {
 
 export default function ParticipantModal({ participant, goal, onClose }) {
   const [showShareCard, setShowShareCard] = useState(false)
+  const [mounted, setMounted] = useState(false)
   
   const xp = participant.xp || 0
   const progressPercent = Math.min((participant.followers / goal) * 100, 100)
@@ -32,6 +34,11 @@ export default function ParticipantModal({ participant, goal, onClose }) {
     xpToNextRank = nextRankData.xpNeeded
     nextRankName = nextRankData.rank.name
   }
+
+  // Mount check for portal
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Close on escape key
   useEffect(() => {
@@ -56,6 +63,9 @@ export default function ParticipantModal({ participant, goal, onClose }) {
     }
   }, [])
 
+  // Don't render until mounted (for SSR)
+  if (!mounted) return null
+
   // Show share card
   if (showShareCard) {
     return (
@@ -67,19 +77,21 @@ export default function ParticipantModal({ participant, goal, onClose }) {
     )
   }
 
-  return (
+  const modalContent = (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 z-[9999] overflow-y-auto animate-fade-in"
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm" />
+      <div className="fixed inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm" />
       
-      {/* Modal */}
-      <div 
-        className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 w-full max-w-md overflow-hidden animate-scale-in"
-        onClick={(e) => e.stopPropagation()}
-      >
+      {/* Centering wrapper */}
+      <div className="min-h-full flex items-center justify-center p-4">
+        {/* Modal */}
+        <div 
+          className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 w-full max-w-md overflow-hidden animate-scale-in"
+          onClick={(e) => e.stopPropagation()}
+        >
         {/* Close button */}
         <button
           onClick={onClose}
@@ -218,6 +230,9 @@ export default function ParticipantModal({ participant, goal, onClose }) {
           </div>
         </div>
       </div>
+      </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }

@@ -189,10 +189,10 @@ export async function GET() {
       })
     )
     
-    // Sort by XP (descending)
-    enrichedParticipants.sort((a, b) => b.xp - a.xp)
+    // Sort by followers (descending)
+    enrichedParticipants.sort((a, b) => b.followers - a.followers)
     
-    // Check for position-based achievements (after sorting by XP)
+    // Check for position-based achievements (after sorting by followers)
     // Pass all participants and challenge start date for competition achievement validation
     for (let i = 0; i < enrichedParticipants.length; i++) {
       const participant = enrichedParticipants[i]
@@ -221,8 +221,8 @@ export async function GET() {
       }
     }
     
-    // Re-sort after potential XP changes from new achievements
-    enrichedParticipants.sort((a, b) => b.xp - a.xp)
+    // Re-sort by followers after potential changes
+    enrichedParticipants.sort((a, b) => b.followers - a.followers)
     
     // Get most recent update time from participants
     const lastUpdated = enrichedParticipants.reduce((latest, p) => {
