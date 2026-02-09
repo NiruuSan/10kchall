@@ -189,8 +189,11 @@ export async function GET() {
       })
     )
     
-    // Sort by followers (descending)
-    enrichedParticipants.sort((a, b) => b.followers - a.followers)
+    // Sort by followers (descending), then by likes as tiebreaker
+    enrichedParticipants.sort((a, b) => {
+      if (b.followers !== a.followers) return b.followers - a.followers
+      return b.likes - a.likes
+    })
     
     // Check for position-based achievements (after sorting by followers)
     // Pass all participants and challenge start date for competition achievement validation
@@ -221,8 +224,11 @@ export async function GET() {
       }
     }
     
-    // Re-sort by followers after potential changes
-    enrichedParticipants.sort((a, b) => b.followers - a.followers)
+    // Re-sort by followers (with likes tiebreaker) after potential changes
+    enrichedParticipants.sort((a, b) => {
+      if (b.followers !== a.followers) return b.followers - a.followers
+      return b.likes - a.likes
+    })
     
     // Get most recent update time from participants
     const lastUpdated = enrichedParticipants.reduce((latest, p) => {

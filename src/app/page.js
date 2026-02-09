@@ -13,11 +13,40 @@ export default function Home() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [notifications, setNotifications] = useState([])
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
-    fetchData()
-    fetchRecentMilestones()
+    // Try to auto-refresh first, then fetch data
+    tryAutoRefresh()
   }, [])
+
+  const tryAutoRefresh = async () => {
+    try {
+      // Check if we can refresh
+      const statusRes = await fetch('/api/auto-refresh')
+      const status = await statusRes.json()
+      
+      console.log('Auto-refresh status:', status)
+      
+      if (status.canRefresh) {
+        setRefreshing(true)
+        console.log('Starting auto-refresh...')
+        // Trigger refresh
+        const refreshRes = await fetch('/api/auto-refresh', { method: 'POST' })
+        const refreshResult = await refreshRes.json()
+        console.log('Auto-refresh result:', refreshResult)
+      } else {
+        console.log('Auto-refresh on cooldown, remaining:', status.remainingMinutes, 'minutes')
+      }
+    } catch (error) {
+      console.error('Auto-refresh check failed:', error)
+    } finally {
+      setRefreshing(false)
+      // Always fetch data after refresh attempt
+      fetchData()
+      fetchRecentMilestones()
+    }
+  }
 
   const fetchData = async () => {
     try {
@@ -77,8 +106,11 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-3">
         <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-700 border-t-zinc-400"></div>
+        {refreshing && (
+          <p className="text-zinc-500 text-sm animate-pulse">Refreshing stats...</p>
+        )}
       </div>
     )
   }
