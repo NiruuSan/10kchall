@@ -24,6 +24,10 @@ export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [authError, setAuthError] = useState('')
   const [authSubmitting, setAuthSubmitting] = useState(false)
+  
+  // Edit views state
+  const [editingViews, setEditingViews] = useState(null) // participant id
+  const [viewsInput, setViewsInput] = useState('')
 
   useEffect(() => {
     if (user) {
@@ -135,6 +139,7 @@ export default function AdminPage() {
           followers: tiktokData.followers,
           likes: tiktokData.likes,
           videos: tiktokData.videos,
+          // Preserve existing max_video_views (manual entry)
         })
       })
       
@@ -179,6 +184,33 @@ export default function AdminPage() {
       }
     } catch (error) {
       console.error('Failed to delete:', error)
+    }
+  }
+
+  const updateViews = async (participant) => {
+    const views = parseInt(viewsInput) || 0
+    if (views < 0) return
+    
+    try {
+      const res = await fetch('/api/participants', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          participantId: participant.id,
+          max_video_views: views,
+        })
+      })
+      
+      if (res.ok) {
+        const data = await res.json()
+        setParticipants(prev => prev.map(p => 
+          p.id === participant.id ? { ...p, ...data.participant, max_video_views: views } : p
+        ))
+        setEditingViews(null)
+        setViewsInput('')
+      }
+    } catch (error) {
+      console.error('Failed to update views:', error)
     }
   }
 
@@ -441,6 +473,51 @@ export default function AdminPage() {
                 <div className="bg-white dark:bg-zinc-800/50 rounded-lg p-3">
                   <p className="text-zinc-500 text-xs mb-1">Videos</p>
                   <p className="text-lg font-semibold text-zinc-900 dark:text-white">{formatNumber(participant.videos)}</p>
+                </div>
+                <div className="bg-white dark:bg-zinc-800/50 rounded-lg p-3">
+                  <p className="text-zinc-500 text-xs mb-1">Best Views</p>
+                  {editingViews === participant.id ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={viewsInput}
+                        onChange={(e) => setViewsInput(e.target.value)}
+                        placeholder="Enter views"
+                        className="w-24 px-2 py-1 text-sm bg-zinc-100 dark:bg-zinc-700 border border-zinc-300 dark:border-zinc-600 rounded text-zinc-900 dark:text-white"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') updateViews(participant)
+                          if (e.key === 'Escape') { setEditingViews(null); setViewsInput('') }
+                        }}
+                      />
+                      <button
+                        onClick={() => updateViews(participant)}
+                        className="text-green-600 hover:text-green-700 text-xs font-medium"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => { setEditingViews(null); setViewsInput('') }}
+                        className="text-zinc-400 hover:text-zinc-600 text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg font-semibold text-zinc-900 dark:text-white">{formatNumber(participant.max_video_views || 0)}</p>
+                      <button
+                        onClick={() => {
+                          setEditingViews(participant.id)
+                          setViewsInput(participant.max_video_views?.toString() || '')
+                        }}
+                        className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 text-xs"
+                        title="Edit best views"
+                      >
+                        ✏️
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               

@@ -79,7 +79,7 @@ export async function GET(request) {
         const tiktokData = tiktokJson.data
         const previousFollowers = participant.followers
         
-        // Update participant
+        // Update participant (preserve max_video_views - it's manually entered)
         const updates = {
           followers: tiktokData.followers,
           likes: tiktokData.likes,

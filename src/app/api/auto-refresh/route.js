@@ -5,7 +5,6 @@ import { FOLLOWER_MILESTONES } from '@/lib/milestones'
 const REFRESH_COOLDOWN_MS = 60 * 60 * 1000 // 1 hour in milliseconds
 
 async function fetchTikTokData(username) {
-  // Use the same scraping logic as the tiktok API route
   const cleanUsername = username.replace('@', '')
   const url = `https://www.tiktok.com/@${cleanUsername}`
   
@@ -24,7 +23,6 @@ async function fetchTikTokData(username) {
     
     const html = await response.text()
     
-    // Extract JSON data from the page
     const scriptMatch = html.match(/<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)<\/script>/)
     
     if (!scriptMatch) {
@@ -128,7 +126,7 @@ export async function POST(request) {
         
         const previousFollowers = participant.followers
         
-        // Update participant
+        // Update participant (preserve max_video_views - it's manually entered)
         const { error: updateError } = await supabase
           .from('participants')
           .update({
